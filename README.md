@@ -3,7 +3,7 @@
 ## Bug
 
 When running `docker exec` from inside a devcontainer (using [`docker-outside-of-docker`](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker)),
-the CLI's attached stdio stream is dropped after ~530ms regardless of command duration.
+the CLI's attached stdio stream is dropped after ~550ms regardless of command duration.
 The exec'd process continues running inside the target container — only the client-side
 stream is severed.
 
@@ -27,19 +27,15 @@ proving the socket transport is fine.
 
 ### Steps
 
-1. Open this project in a devcontainer:
-   ```
-   devcontainer open .
-   ```
+1. Open this project in a [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers)
 
 2. Inside the devcontainer terminal, run:
    ```bash
-   chmod +x repro.sh
    ./repro.sh
    ```
 
 3. Observe:
-   - **Test 1** (`docker exec`): prints only 1 tick, returns in ~530ms ❌
+   - **Test 1** (`docker exec`): prints only 1 tick, returns in ~550ms ❌
    - **Test 2** (`curl` via same socket): prints all 3 ticks, takes ~3s ✅
    - **Test 3** (process survival): exec'd process completes inside container ✅
 
@@ -48,7 +44,7 @@ proving the socket transport is fine.
 ```bash
 # Inside the devcontainer — broken:
 docker exec <container> sh -c 'for i in 1 2 3; do echo tick:$i; sleep 1; done'
-# Returns after ~530ms with only "tick:1"
+# Returns after ~550ms with only "tick:1"
 
 # On the host — works:
 docker exec <container> sh -c 'for i in 1 2 3; do echo tick:$i; sleep 1; done'
