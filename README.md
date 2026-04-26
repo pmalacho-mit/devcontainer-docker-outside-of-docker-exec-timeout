@@ -51,27 +51,6 @@ docker exec <container> sh -c 'for i in 1 2 3; do echo tick:$i; sleep 1; done'
 # Returns after ~3s with all three ticks
 ```
 
-## Analysis
-
-The Docker CLI uses HTTP connection hijacking for `exec start` — it sends
-`Connection: Upgrade`, receives `101 Switching Protocols`, then takes over the
-raw TCP/Unix socket connection for bidirectional stdio streaming. Something in
-this hijack path fails when the CLI runs as a Linux binary inside a container
-communicating over a bind-mounted Docker socket.
-
-`curl` uses a plain HTTP POST and reads the chunked/streaming response body
-without connection hijacking, which is why it succeeds through the same socket.
-
-### Ruled out
-
-| Hypothesis | Evidence against |
-|---|---|
-| socat proxy (docker-outside-of-docker non-root shim) | Bypassing socat via `/var/run/docker-host.sock` still drops |
-| Docker Desktop `com.docker.backend` proxy | Host CLI works; bind-mounted socket bypasses host proxy |
-| TTY vs demuxed stream | `-t` flag makes no difference |
-| Socket transport / bind mount | `curl` works through the same socket |
-| API version mismatch | CLI negotiates down to matching 1.53 |
-
 ## Expected behavior
 
 `docker exec` should stream stdout/stderr for the full duration of the
