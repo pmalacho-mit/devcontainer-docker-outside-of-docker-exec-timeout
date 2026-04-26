@@ -8,14 +8,13 @@ The exec'd process continues running inside the target container — only the cl
 stream is severed.
 
 The same API calls made with `curl` through the **same Unix socket** work correctly,
-proving the socket transport is fine and the bug is in the Docker CLI's HTTP
-connection hijack (`101 Switching Protocols` upgrade) path.
+proving the socket transport is fine.
 
 ## Environment
 
 - **Host:** macOS (Apple Silicon) with Docker Desktop 4.65.0
 - **Devcontainer:** `mcr.microsoft.com/devcontainers/base:ubuntu` with `docker-outside-of-docker:1`
-- **Docker CLI inside devcontainer:** 29.3.0 (API 1.54, downgraded to 1.53 at runtime)
+- **Docker CLI inside devcontainer:** 29.2.1-29.3 (currently pinned 29.2.1 as version installed in devcontainer to minimize differences)
 - **Docker CLI on host:** 29.2.1 (API 1.53) — works correctly
 - **Docker Server:** 29.2.1 (API 1.53)
 
